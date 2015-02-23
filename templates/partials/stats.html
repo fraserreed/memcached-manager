@@ -1,0 +1,45 @@
+<div class="row">
+    <div class="col-sm-12">
+
+        {% if stats.pid %}
+        <div class="row">
+            <div class="col-md-6">Process ID</div>
+            <div class="col-md-6">{{stats.pid}}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">Uptime</div>
+            <div class="col-md-6">{{stats.uptime}}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">Memcached Version</div>
+            <div class="col-md-6">{{stats.version}}</div>
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-md-6">Active Nodes</div>
+            <div class="col-md-6">{{stats.activeNodes}}</div>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-6">Maximum Size</div>
+            <div class="col-md-6">{{stats.limitMaxsize}}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">Current Connections</div>
+            <div class="col-md-6">{{stats.currConnections}}</div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">Request Hits</div>
+            <div class="col-md-6">{{stats.getHits}}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">Request Misses</div>
+            <div class="col-md-6">{{stats.getMisses}}</div>
+        </div>
+
+
+    </div>
+</div>

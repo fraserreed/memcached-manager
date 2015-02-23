@@ -1,0 +1,12 @@
+{% extends "layout/main.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <h4>Cluster: <a href="/cluster/{{clusterName}}">{{ clusterName }}</a></h4>
+    </div>
+    <div class="col-md-12 col-sm-12">
+        {% include "partials/keys.html" %}
+    </div>
+</div>
+{% endblock %}

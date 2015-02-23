@@ -1,0 +1,50 @@
+<div class="row">
+    <div class="col-sm-12">
+
+        <h4>Keys</h4>
+
+        <form method="post" action="/cluster/{{clusterName}}/key/add">
+            Key: <input type="text" name="key"/>
+            Value: <input type="text" name="value"/>
+            <button type="submit">Add New Key</button>
+        </form>
+
+        <div class="row">
+            <div class="col-sm-3"><b>Key</b></div>
+            <div class="col-sm-3"><b>Value</b></div>
+            <div class="col-sm-2"><b>Type</b></div>
+            <div class="col-sm-2"><b>CAS</b></div>
+            <div class="col-sm-2"><b>Actions</b></div>
+        </div>
+        <div class="row">
+            {% for element in keystore.keys %}
+            <div class="col-sm-3">{{element.key}}</div>
+            <div class="col-sm-3">{{element.value}}</div>
+            <div class="col-sm-2">{{element.type}}</div>
+            <div class="col-sm-2">{{element.cas}}</div>
+            <div class="col-sm-2">
+                <div class="row">
+                    {% if element.isInteger %}
+                    <div class="col-sm-3">
+                        <a href="/cluster/{{clusterName}}/key/increment/{{element.hash|url_encode}}" alt="Increment" class="glyphicon glyphicon-plus"></a>
+                    </div>
+                    <div class="col-sm-3">
+                        <a href="/cluster/{{clusterName}}/key/decrement/{{element.hash|url_encode}}" alt="Decrement" class="glyphicon glyphicon-minus"></a>
+                    </div>
+                    {% else %}
+                    <div class="col-sm-6"></div>
+                    {% endif %}
+                    <div class="col-sm-3">
+                        <a href="/cluster/{{clusterName}}/key/edit/{{element.hash|url_encode}}" alt="Edit" class="glyphicon glyphicon-pencil"></a>
+                    </div>
+                    <div class="col-sm-3">
+                        <a href="/cluster/{{clusterName}}/key/delete/{{element.hash|url_encode}}" alt="Delete" class="glyphicon glyphicon-trash"></a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+    </div>
+</div>

@@ -1,0 +1,19 @@
+{% extends "layout/main.html" %}
+
+{% block content %}
+<div class="row mt">
+    <div class="col-md-12 col-sm-12">
+
+        <h4>Cluster: <a href="/cluster/{{clusterName}}">{{ clusterName }}</a></h4>
+    </div>
+    <div class="col-md-12 col-sm-12">
+        <form method="post" action="/cluster/{{clusterName}}/key/edit">
+            <input type="hidden" name="key" value="{{key.hash}}"/>
+            Key: {{key.key}}<br/>
+            Value: <input type="text" name="value" value="{{key.value}}"/>
+            <br/>
+            <button type="submit">Edit New Key</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
