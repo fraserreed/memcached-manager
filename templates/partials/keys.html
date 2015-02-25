@@ -19,7 +19,13 @@
         <div class="row">
             {% for element in keystore.keys %}
             <div class="col-sm-3">{{element.key}}</div>
-            <div class="col-sm-3">{{element.value}}</div>
+            <div class="col-sm-3">
+                {% if ( ( element.type == 'int' ) or ( element.type == 'string' ) ) and element.value|length < 24 %}
+                {{element.value|escape}}
+                {% else %}
+                ..
+                {% endif %}
+            </div>
             <div class="col-sm-2">{{element.type}}</div>
             <div class="col-sm-2">{{element.cas}}</div>
             <div class="col-sm-2">

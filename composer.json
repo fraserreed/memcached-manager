@@ -4,11 +4,12 @@
   },
   "require-dev": {
     "phpunit/phpunit": "~4",
-    "satooshi/php-coveralls":"~0.6"
+    "satooshi/php-coveralls": "~0.6"
   },
   "autoload": {
-    "psr-0": {
-      "MemcachedManager": "src/"
+    "psr-4": {
+      "MemcachedManager\\": "src/MemcachedManager",
+      "MemcachedManager\\Tests\\": "tests/"
     }
   }
 }

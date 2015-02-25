@@ -40,6 +40,14 @@ abstract class AbstractClient implements IClient
     }
 
     /**
+     * @return Direct
+     */
+    public function getDirectClient()
+    {
+        return new Direct( $this->servers );
+    }
+
+    /**
      * @return array
      */
     public function getServers()

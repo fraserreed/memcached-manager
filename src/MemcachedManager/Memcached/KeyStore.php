@@ -15,19 +15,21 @@ class KeyStore
      */
     public function __construct( array $keys )
     {
-        /** @var $node \MemcachedManager\Memcached\Node */
-        foreach( $keys as $value )
+        if( !empty( $keys ) )
         {
-            $key = new Key();
-            $key->setKey( isset( $value[ 'key' ] ) ? $value[ 'key' ] : null );
-            $key->setValue( isset( $value[ 'value' ] ) ? $value[ 'value' ] : null );
-            $key->setCas( isset( $value[ 'cas' ] ) ? $value[ 'cas' ] : null );
+            foreach( $keys as $value )
+            {
+                $key = new Key();
+                $key->setKey( isset( $value[ 'key' ] ) ? $value[ 'key' ] : null );
+                $key->setValue( isset( $value[ 'value' ] ) ? $value[ 'value' ] : null );
+                $key->setCas( isset( $value[ 'cas' ] ) ? $value[ 'cas' ] : null );
 
-            $this->addKey( $value[ 'key' ], $key );
+                $this->addKey( $value[ 'key' ], $key );
+            }
+
+            //sort the keys
+            ksort( $this->keys );
         }
-
-        //sort the keys
-        ksort( $this->keys );
     }
 
     /**

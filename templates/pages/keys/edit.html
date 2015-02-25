@@ -10,7 +10,11 @@
         <form method="post" action="/cluster/{{clusterName}}/key/edit">
             <input type="hidden" name="key" value="{{key.hash}}"/>
             Key: {{key.key}}<br/>
-            Value: <input type="text" name="value" value="{{key.value}}"/>
+            {% if ( key.type == 'int' ) or ( key.type == 'string' ) %}
+            Value: <input type="text" name="value" value="{{key.value|escape}}"/>
+            {% else %}
+            <pre>{{dump(key.value)}}</pre>
+            {% endif %}
             <br/>
             <button type="submit">Edit New Key</button>
         </form>

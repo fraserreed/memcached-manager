@@ -1,11 +1,12 @@
 <?php
 
-namespace MemcachedManager\Tests\Unit;
+namespace MemcachedManager\Tests\Unit\Memcached;
 
 
 use MemcachedManager\Memcached\Node;
+use MemcachedManager\Tests\Unit\UnitTestCase;
 
-class NodeTest extends \PHPUnit_Framework_TestCase
+class NodeTest extends UnitTestCase
 {
 
     public function testConstruct()

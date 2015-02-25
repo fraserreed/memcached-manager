@@ -5,7 +5,7 @@ namespace MemcachedManager\Tests\Unit;
 
 use MemcachedManager\Config;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends UnitTestCase
 {
     public function testReadAll()
     {

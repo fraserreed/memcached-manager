@@ -10,6 +10,7 @@ class Key
     const TYPE_INT = 'int';
     const TYPE_STRING = 'string';
     const TYPE_ARRAY = 'array';
+    const TYPE_OBJECT = 'object';
 
     /**
      * @var string
@@ -94,8 +95,10 @@ class Key
 
         if( is_int( $this->value ) || is_numeric( $this->value ) )
             $this->type = self::TYPE_INT;
-        else if( is_array( $this->value ) )
+        else if( is_array( $this->value )  || gettype( $this->value ) == 'array' )
             $this->type = self::TYPE_ARRAY;
+        else if( is_object( $this->value ) || gettype( $this->value ) == 'object' )
+            $this->type = self::TYPE_OBJECT;
         else
             $this->type = self::TYPE_STRING;
     }

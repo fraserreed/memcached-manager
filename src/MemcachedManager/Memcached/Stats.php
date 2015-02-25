@@ -146,7 +146,7 @@ class Stats
      */
     public function setUptime( $uptime )
     {
-        $this->uptime = $uptime;
+        $this->uptime = (int) $uptime;
     }
 
     /**
@@ -154,6 +154,9 @@ class Stats
      */
     public function getUptime()
     {
+        if( $this->uptime == 0 )
+            return null;
+
         $secondsInAMinute = 60;
         $secondsInAnHour  = 60 * $secondsInAMinute;
         $secondsInADay    = 24 * $secondsInAnHour;
@@ -172,11 +175,27 @@ class Stats
         // extract the remaining seconds
         $seconds = ceil( $minuteSeconds % 60 );
 
-        return
-            ( ( $days > 1 ) ? $days . ' days ' : ( $days > 0 ) ? $days . ' day ' : ' ' ) .
-            ( ( $hours > 1 ) ? $hours . ' hours ' : ( ( $hours > 0 ) ? $hours . ' hour ' : ' ' ) ) .
-            ( ( $minutes > 1 ) ? $minutes . ' minutes ' : ( ( $minutes > 0 ) ? $minutes . ' minute ' : ' ' ) ) .
-            ( ( $seconds > 1 ) ? $seconds . ' seconds ' : ( ( $seconds > 0 ) ? $seconds . ' second ' : ' ' ) );
+        $time = array();
+
+        if( $days > 0 )
+            $time[ ] = $days . ( ( $days > 1 ) ? ' days' : ' day' );
+
+        if( ( $hours > 0 ) )
+            $time[ ] = $hours . ( ( $hours > 1 ) ? ' hours' : ' hour' );
+        else if( count( $time ) > 0 )
+            $time[ ] = '0 hours';
+
+        if( ( $minutes > 0 ) )
+            $time[ ] = $minutes . ( ( $minutes > 1 ) ? ' minutes' : ' minute' );
+        else if( count( $time ) > 0 )
+            $time[ ] = '0 minutes';
+
+        if( ( $seconds > 0 ) )
+            $time[ ] = $seconds . ( ( $seconds > 1 ) ? ' seconds' : ' second' );
+        else if( count( $time ) > 0 )
+            $time[ ] = '0 seconds';
+
+        return implode( ' ', $time );
     }
 
     /**
@@ -184,7 +203,7 @@ class Stats
      */
     public function setThreads( $threads )
     {
-        $this->threads = $threads;
+        $this->threads = (int) $threads;
     }
 
     /**
@@ -200,7 +219,7 @@ class Stats
      */
     public function setPointerSize( $pointerSize )
     {
-        $this->pointerSize = $pointerSize;
+        $this->pointerSize = (int) $pointerSize;
     }
 
     /**
@@ -232,7 +251,7 @@ class Stats
      */
     public function setCurrItems( $currItems )
     {
-        $this->currItems = $currItems;
+        $this->currItems = (int) $currItems;
     }
 
     /**
@@ -248,7 +267,7 @@ class Stats
      */
     public function setTotalItems( $totalItems )
     {
-        $this->totalItems = $totalItems;
+        $this->totalItems = (int) $totalItems;
     }
 
     /**
@@ -264,7 +283,7 @@ class Stats
      */
     public function setLimitMaxbytes( $limitMaxbytes )
     {
-        $this->limitMaxbytes = $limitMaxbytes;
+        $this->limitMaxbytes = (int) $limitMaxbytes;
     }
 
     /**
@@ -297,7 +316,7 @@ class Stats
      */
     public function setCurrConnections( $currConnections )
     {
-        $this->currConnections = $currConnections;
+        $this->currConnections = (int) $currConnections;
     }
 
     /**
@@ -313,7 +332,7 @@ class Stats
      */
     public function setTotalConnections( $totalConnections )
     {
-        $this->totalConnections = $totalConnections;
+        $this->totalConnections = (int) $totalConnections;
     }
 
     /**
@@ -329,7 +348,7 @@ class Stats
      */
     public function setConnectionStructures( $connectionStructures )
     {
-        $this->connectionStructures = $connectionStructures;
+        $this->connectionStructures = (int) $connectionStructures;
     }
 
     /**
@@ -345,7 +364,7 @@ class Stats
      */
     public function setBytes( $bytes )
     {
-        $this->bytes = $bytes;
+        $this->bytes = (int) $bytes;
     }
 
     /**
@@ -361,7 +380,7 @@ class Stats
      */
     public function setCmdGet( $cmdGet )
     {
-        $this->cmdGet = $cmdGet;
+        $this->cmdGet = (int) $cmdGet;
     }
 
     /**
@@ -377,7 +396,7 @@ class Stats
      */
     public function setCmdSet( $cmdSet )
     {
-        $this->cmdSet = $cmdSet;
+        $this->cmdSet = (int) $cmdSet;
     }
 
     /**
@@ -393,7 +412,7 @@ class Stats
      */
     public function setGetHits( $getHits )
     {
-        $this->getHits = $getHits;
+        $this->getHits = (int) $getHits;
     }
 
     /**
@@ -409,7 +428,7 @@ class Stats
      */
     public function setGetMisses( $getMisses )
     {
-        $this->getMisses = $getMisses;
+        $this->getMisses = (int) $getMisses;
     }
 
     /**
@@ -425,7 +444,7 @@ class Stats
      */
     public function setEvictions( $evictions )
     {
-        $this->evictions = $evictions;
+        $this->evictions = (int) $evictions;
     }
 
     /**
@@ -441,7 +460,7 @@ class Stats
      */
     public function setBytesRead( $bytesRead )
     {
-        $this->bytesRead = $bytesRead;
+        $this->bytesRead = (int) $bytesRead;
     }
 
     /**
@@ -457,7 +476,7 @@ class Stats
      */
     public function setBytesWritten( $bytesWritten )
     {
-        $this->bytesWritten = $bytesWritten;
+        $this->bytesWritten = (int) $bytesWritten;
     }
 
     /**

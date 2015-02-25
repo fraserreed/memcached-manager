@@ -3,9 +3,10 @@
 namespace MemcachedManager\Tests\Unit\Utils;
 
 
+use MemcachedManager\Tests\Unit\UnitTestCase;
 use MemcachedManager\Utils\Hash;
 
-class HashTest extends \PHPUnit_Framework_TestCase
+class HashTest extends UnitTestCase
 {
     public function testEncode()
     {

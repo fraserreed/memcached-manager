@@ -1,13 +1,14 @@
 <?php
 
-namespace MemcachedManager\Tests\Unit;
+namespace MemcachedManager\Tests\Unit\Memcached;
 
 
 use MemcachedManager\Memcached\Cluster;
 use MemcachedManager\Memcached\Node;
 use MemcachedManager\Memcached\Stats;
+use MemcachedManager\Tests\Unit\UnitTestCase;
 
-class ClusterTest extends \PHPUnit_Framework_TestCase
+class ClusterTest extends UnitTestCase
 {
     public function testConstruct()
     {
