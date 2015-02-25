@@ -12,6 +12,11 @@ abstract class AbstractClient implements IClient
      */
     private $servers;
 
+    /**
+     * @var mixed
+     */
+    protected $clientClass;
+
     public function __construct( array $servers )
     {
         $this->servers = $servers;
@@ -21,6 +26,16 @@ abstract class AbstractClient implements IClient
      * @return IClient
      */
     abstract public function getClientClass();
+
+    /**
+     * Expose public setter for unit testing
+     *
+     * @param $clientClass
+     */
+    public function setClientClass( $clientClass )
+    {
+        $this->clientClass = $clientClass;
+    }
 
     public function getClient()
     {

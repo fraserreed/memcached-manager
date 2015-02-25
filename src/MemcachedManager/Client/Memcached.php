@@ -12,7 +12,10 @@ class Memcached extends AbstractClient
      */
     public function getClientClass()
     {
-        return new PhpMemcached();
+        if( !$this->clientClass )
+            $this->clientClass = new PhpMemcached();
+
+        return $this->clientClass;
     }
 
     /**
