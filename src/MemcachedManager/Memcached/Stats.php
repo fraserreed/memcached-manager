@@ -3,6 +3,8 @@
 namespace MemcachedManager\Memcached;
 
 
+use MemcachedManager\Utils\Time;
+
 class Stats
 {
     /**
@@ -157,45 +159,7 @@ class Stats
         if( $this->uptime == 0 )
             return null;
 
-        $secondsInAMinute = 60;
-        $secondsInAnHour  = 60 * $secondsInAMinute;
-        $secondsInADay    = 24 * $secondsInAnHour;
-
-        // extract days
-        $days = floor( $this->uptime / $secondsInADay );
-
-        // extract hours
-        $hourSeconds = $this->uptime % $secondsInADay;
-        $hours       = floor( $hourSeconds / $secondsInAnHour );
-
-        // extract minutes
-        $minuteSeconds = $hourSeconds % $secondsInAnHour;
-        $minutes       = floor( $minuteSeconds / $secondsInAMinute );
-
-        // extract the remaining seconds
-        $seconds = ceil( $minuteSeconds % 60 );
-
-        $time = array();
-
-        if( $days > 0 )
-            $time[ ] = $days . ( ( $days > 1 ) ? ' days' : ' day' );
-
-        if( ( $hours > 0 ) )
-            $time[ ] = $hours . ( ( $hours > 1 ) ? ' hours' : ' hour' );
-        else if( count( $time ) > 0 )
-            $time[ ] = '0 hours';
-
-        if( ( $minutes > 0 ) )
-            $time[ ] = $minutes . ( ( $minutes > 1 ) ? ' minutes' : ' minute' );
-        else if( count( $time ) > 0 )
-            $time[ ] = '0 minutes';
-
-        if( ( $seconds > 0 ) )
-            $time[ ] = $seconds . ( ( $seconds > 1 ) ? ' seconds' : ' second' );
-        else if( count( $time ) > 0 )
-            $time[ ] = '0 seconds';
-
-        return implode( ' ', $time );
+        return Time::readableTime( $this->uptime );
     }
 
     /**
