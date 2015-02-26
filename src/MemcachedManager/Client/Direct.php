@@ -3,11 +3,14 @@
 namespace MemcachedManager\Client;
 
 
+use MemcachedManager\Connection\IConnection;
 use MemcachedManager\Connection\Socket;
 use MemcachedManager\Exceptions\NotImplementedException;
 
 class Direct extends AbstractClient
 {
+    private $connections = array();
+
     /**
      * @throws NotImplementedException
      * @return \Memcached|\Memcache
@@ -39,6 +42,32 @@ class Direct extends AbstractClient
     }
 
     /**
+     * Expose setter for testing
+     *
+     * @param             $host
+     * @param             $port
+     * @param IConnection $socket
+     */
+    public function setConnection( $host, $port, IConnection $socket )
+    {
+        $this->connections[ $host . ':' . $port ] = $socket;
+    }
+
+    /**
+     * @param $host
+     * @param $port
+     *
+     * @return mixed
+     */
+    private function getConnection( $host, $port )
+    {
+        if( !isset( $this->connections[ $host . ':' . $port ] ) )
+            $this->connections[ $host . ':' . $port ] = new Socket( $host, $port );
+
+        return $this->connections[ $host . ':' . $port ];
+    }
+
+    /**
      * @throws NotImplementedException
      * @return array
      */
@@ -48,15 +77,15 @@ class Direct extends AbstractClient
 
         foreach( $this->getServers() as $server )
         {
-            $connection = new Socket( $server[ 'host' ], $server[ 'port' ] );
+            $connection = $this->getConnection( $server[ 'host' ], $server[ 'port' ] );
 
-            $slabs = $this->processRawSlabs( $connection->execute( 'stats slabs' ) );
+            $slabs = $this->processRawResponse( '/^STAT\s(\d+)\:(\w+)\s(\d+)/', $connection->execute( 'stats slabs' ) );
 
             if( count( $slabs ) > 0 )
             {
                 foreach( $slabs as $slabId => $slab )
                 {
-                    $items = $this->processRawItems( $connection->execute( 'stats items ' . $slabId ) );
+                    $items = $this->processRawResponse( '/^STAT\sitems:(\d+)\:(\w+)\s(\d+)/', $connection->execute( 'stats items ' . $slabId ) );
 
                     if( count( $items ) > 0 )
                     {
@@ -73,43 +102,27 @@ class Direct extends AbstractClient
     }
 
     /**
+     * @param       $regex
      * @param array $response
      *
      * @return array
      */
-    private function processRawSlabs( array $response )
+    private function processRawResponse( $regex, array $response )
     {
         $slabs = array();
 
-        foreach( $response as $item )
+        if( !empty( $response ) )
         {
-            preg_match( '/^STAT\s(\d+)\:(\w+)\s(\d+)/', $item, $m );
+            foreach( $response as $item )
+            {
+                preg_match( $regex, $item, $m );
 
-            if( $m && isset( $m[ 1 ] ) )
-                $slabs[ $m[ 1 ] ][ $m[ 2 ] ] = $m[ 3 ];
+                if( $m && isset( $m[ 1 ] ) )
+                    $slabs[ $m[ 1 ] ][ $m[ 2 ] ] = $m[ 3 ];
+            }
         }
 
         return $slabs;
-    }
-
-    /**
-     * @param array $response
-     *
-     * @return array
-     */
-    private function processRawItems( array $response )
-    {
-        $items = array();
-
-        foreach( $response as $item )
-        {
-            preg_match( '/^STAT\sitems:(\d+)\:(\w+)\s(\d+)/', $item, $m );
-
-            if( $m && isset( $m[ 1 ] ) )
-                $items[ $m[ 1 ] ][ $m[ 2 ] ] = $m[ 3 ];
-        }
-
-        return $items;
     }
 
     /**

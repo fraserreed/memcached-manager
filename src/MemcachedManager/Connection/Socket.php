@@ -5,7 +5,7 @@ namespace MemcachedManager\Connection;
 
 use MemcachedManager\Exceptions\SocketConnectionException;
 
-class Socket
+class Socket implements IConnection
 {
     const SOCKET_TIMEOUT = 3;
 

@@ -86,6 +86,9 @@ abstract class AbstractClient implements IClient
             {
                 foreach( $clusterStats as $node => $nodeStatistics )
                 {
+                    if( !isset( $nodeStatistics[ 'version' ] ) )
+                        continue;
+
                     if( $nodeStatistics[ 'pid' ] > 0 )
                         $stats->incrementActiveNodes();
 
