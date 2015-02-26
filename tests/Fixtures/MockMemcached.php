@@ -3,7 +3,9 @@
 namespace MemcachedManager\Tests\Fixtures;
 
 
-class MockMemcached
+use MemcachedManager\Client\IClient;
+
+class MockMemcached implements IClient
 {
     protected $servers = array();
 
@@ -12,6 +14,16 @@ class MockMemcached
     protected $keys = array();
 
     protected $delayed;
+
+    public function __construct( $servers = array() )
+    {
+        $this->servers = $servers;
+    }
+
+    public function getServers()
+    {
+        return $this->servers;
+    }
 
     public function addServer( $host, $port )
     {
@@ -34,6 +46,14 @@ class MockMemcached
     public function getAllKeys()
     {
         return $this->keys;
+    }
+
+    /**
+     * @return array
+     */
+    public function getKeys()
+    {
+        return $this->getAllKeys();
     }
 
     /**
@@ -111,5 +131,86 @@ class MockMemcached
     {
         if( isset( $this->keys[ $key ] ) && is_integer( $this->keys[ $key ] ) )
             $this->keys[ $key ]--;
+    }
+
+    /**
+     * @return IClient
+     */
+    public function getClientClass()
+    {
+        return $this;
+    }
+
+    /**
+     * @param $host
+     * @param $port
+     *
+     * @return bool
+     */
+    public function test( $host, $port )
+    {
+        return true;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @return void
+     */
+    public function addKey( $key, $value )
+    {
+        $this->add( $key, $value );
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @return void
+     */
+    public function editKey( $key, $value )
+    {
+        $this->replace( $key, $value );
+    }
+
+    /**
+     * @param $key
+     *
+     * @return \MemcachedManager\Memcached\Key
+     */
+    public function getKey( $key )
+    {
+        return $this->get( $key );
+    }
+
+    /**
+     * @param $key
+     *
+     * @return void
+     */
+    public function deleteKey( $key )
+    {
+        $this->delete( $key );
+    }
+
+    /**
+     * @param $key
+     *
+     * @return void
+     */
+    public function incrementKey( $key )
+    {
+        $this->increment( $key );
+    }
+
+    /**
+     * @param $key
+     *
+     * @return void
+     */
+    public function decrementKey( $key )
+    {
+        $this->decrement( $key );
     }
 }

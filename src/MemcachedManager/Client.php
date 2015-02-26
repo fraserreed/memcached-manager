@@ -25,34 +25,35 @@ class Client
      */
     protected $clusters = array();
 
-    public function __construct( $servers )
+    public function __construct( $servers, $clientClass = null )
     {
-        //determine the storage type
-        if( class_exists( 'Memcached' ) )
+        if( $clientClass )
         {
-            $this->client = new Memcached( $servers );
+            $this->client = new $clientClass( $servers );
+        }
+        else
+        {
+            //determine the storage type
+            if( class_exists( 'Memcached' ) )
+            {
+                $this->client = new Memcached( $servers );
+            }
 
-//            if( !method_exists( $this->client, 'getAllKeys' ) )
-//            {
-//                $this->client = null;
-//            }
+            if( !$this->client && class_exists( 'Memcache' ) )
+            {
+                $this->client = new Memcache( $servers );
+            }
         }
 
-        if( !$this->client && class_exists( 'Memcache' ) )
-        {
-            $this->client = new Memcache( $servers );
-        }
+        if( !( $this->client instanceof IClient ) )
+            throw new ClientNotFoundException( 'Client could not be initialized' );
     }
 
     /**
      * @return IClient
-     * @throws ClientNotFoundException
      */
     private function getClient()
     {
-        if( !$this->client )
-            throw new ClientNotFoundException( 'Client could not be initialized' );
-
         return $this->client;
     }
 
@@ -84,7 +85,7 @@ class Client
                 if( !isset( $this->clusters[ $server[ 'cluster' ] ] ) )
                     $this->clusters[ $server[ 'cluster' ] ] = new Cluster( $server[ 'cluster' ] );
 
-                $node = new Node( $server[ 'host' ], $server[ 'port' ], $server[ 'name' ] );
+                $node = new Node( $server[ 'host' ], $server[ 'port' ], isset( $server[ 'name' ] ) ? $server[ 'name' ] : $server[ 'host' ] );
                 $node->setAlive( $this->testConnection( $node ) );
 
                 //add the node to the cluster
@@ -94,7 +95,10 @@ class Client
             //prime the cluster stats
             /** @var $cluster \MemcachedManager\Memcached\Cluster */
             foreach( $this->clusters as $cluster )
-                $cluster->setStats( $this->getClient()->getStats() );
+            {
+                if( $stats = $this->getClient()->getStats() )
+                    $cluster->setStats( $stats );
+            }
         }
 
         return $this->clusters;
