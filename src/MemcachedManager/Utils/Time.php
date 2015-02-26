@@ -9,6 +9,15 @@ class Time
     const SECONDS_IN_HOUR = 3600;
     const SECONDS_IN_MINUTE = 60;
 
+    /**
+     * Get the readable time for a number of seconds in the following format:
+     *
+     * 1 days 2 hours 3 minutes 4 seconds
+     *
+     * @param $seconds
+     *
+     * @return string
+     */
     public static function readableTime( $seconds )
     {
         return implode(
@@ -31,13 +40,13 @@ class Time
      */
     private static function getReadableDays( $seconds )
     {
-        // extract days
-        $days = floor( $seconds / self::SECONDS_IN_DAY );
-
-        if( $days > 0 )
-            return $days . ( ( $days > 1 ) ? ' days' : ' day' );
-
-        return null;
+        // extract the remaining days
+        return self::formatResult(
+            $seconds,
+            floor( $seconds / self::SECONDS_IN_DAY ),
+            'day',
+            self::SECONDS_IN_DAY
+        );
     }
 
     /**
@@ -47,15 +56,13 @@ class Time
      */
     private static function getReadableHours( $seconds )
     {
-        // extract hours
-        $hours = floor( ( $seconds % self::SECONDS_IN_DAY ) / self::SECONDS_IN_HOUR );
-
-        if( ( $hours > 0 ) )
-            return $hours . ( ( $hours > 1 ) ? ' hours' : ' hour' );
-        else if( $seconds > self::SECONDS_IN_HOUR )
-            return '0 hours';
-
-        return null;
+        // extract the remaining hours
+        return self::formatResult(
+            $seconds,
+            floor( ( $seconds % self::SECONDS_IN_DAY ) / self::SECONDS_IN_HOUR ),
+            'hour',
+            self::SECONDS_IN_HOUR
+        );
     }
 
     /**
@@ -65,15 +72,13 @@ class Time
      */
     private static function getReadableMinutes( $seconds )
     {
-        // extract minutes
-        $minutes = floor( ( ( $seconds % self::SECONDS_IN_DAY ) % self::SECONDS_IN_HOUR ) / self::SECONDS_IN_MINUTE );
-
-        if( ( $minutes > 0 ) )
-            return $minutes . ( ( $minutes > 1 ) ? ' minutes' : ' minute' );
-        else if( $seconds > self::SECONDS_IN_MINUTE )
-            return '0 minutes';
-
-        return null;
+        // extract the remaining minutes
+        return self::formatResult(
+            $seconds,
+            floor( ( ( $seconds % self::SECONDS_IN_DAY ) % self::SECONDS_IN_HOUR ) / self::SECONDS_IN_MINUTE ),
+            'minute',
+            self::SECONDS_IN_MINUTE
+        );
     }
 
     /**
@@ -84,12 +89,28 @@ class Time
     private static function getReadableSeconds( $seconds )
     {
         // extract the remaining seconds
-        $secondsRemaining = ( ( $seconds % self::SECONDS_IN_DAY ) % self::SECONDS_IN_HOUR ) % self::SECONDS_IN_MINUTE;
+        return self::formatResult(
+            $seconds,
+            ( ( $seconds % self::SECONDS_IN_DAY ) % self::SECONDS_IN_HOUR ) % self::SECONDS_IN_MINUTE,
+            'second',
+            self::SECONDS_IN_MINUTE
+        );
+    }
 
-        if( ( $secondsRemaining > 0 ) )
-            return $secondsRemaining . ( ( $secondsRemaining > 1 ) ? ' seconds' : ' second' );
-        else if( $seconds > self::SECONDS_IN_MINUTE )
-            return '0 seconds';
+    /**
+     * @param $seconds
+     * @param $value
+     * @param $word
+     * @param $threshold
+     *
+     * @return null|string
+     */
+    private static function formatResult( $seconds, $value, $word, $threshold )
+    {
+        if( ( $value > 0 ) )
+            return $value . ( ( $value > 1 ) ? ' ' . $word . 's' : ' ' . $word );
+        else if( $seconds > $threshold )
+            return '0 ' . $word . 's';
 
         return null;
     }
