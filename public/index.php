@@ -53,6 +53,12 @@ $app->group( '/cluster', function () use ( $app )
     // get cluster properties
     $app->get( '/:clusterName', function ( $clusterName ) use ( $app )
     {
+//        $t = $app->memcached->getCluster( $clusterName );
+//
+//        echo "<pre>";
+//        print_r( $t );
+//        die();
+
         // Render cluster view
         $app->render( 'pages/cluster.html', array( 'clusterName' => $clusterName, 'cluster' => $app->memcached->getCluster( $clusterName ) ) );
     } );

@@ -7,7 +7,185 @@
     </div>
 
     <div class="col-md-12 col-sm-12">
-        {% include "partials/stats.html" with { 'stats': cluster.stats } %}
+
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4>Cache Usage</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <canvas id="cacheUsage" width="300" height="300"></canvas>
+                    </div>
+                    <div class="col-sm-12 center-block" id="cacheUsageLegend"></div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4>Hits & Misses</h4>
+                    </div>
+                    <div class="col-sm-12">
+                        <canvas id="hitsAndMisses" width="300" height="300"></canvas>
+                    </div>
+                    <div class="col-sm-12" id="hitsAndMissesLegend"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <h4>Cache Information</h4>
+            </div>
+
+            <div class="col-sm-12">
+
+                {% if stats.pid %}
+                <div class="row">
+                    <div class="col-md-6">Memcached Version</div>
+                    <div class="col-md-6">{{cluster.stats.version}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Process ID</div>
+                    <div class="col-md-6">{{cluster.stats.pid}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Uptime</div>
+                    <div class="col-md-6">{{cluster.stats.uptime}}</div>
+                </div>
+                {% else %}
+                <div class="row">
+                    <div class="col-md-6">Active Nodes</div>
+                    <div class="col-md-6">{{cluster.stats.activeNodes}}</div>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    <div class="col-md-6">Maximum Size</div>
+                    <div class="col-md-6">{{cluster.stats.limitMaxsize}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Bytes</div>
+                    <div class="col-md-6">{{cluster.stats.bytes}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Bytes Read</div>
+                    <div class="col-md-6">{{cluster.stats.bytesRead}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Bytes Written</div>
+                    <div class="col-md-6">{{cluster.stats.bytesWritten}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">Threads</div>
+                    <div class="col-md-6">{{cluster.stats.threads}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">Current Connections</div>
+                    <div class="col-md-6">{{cluster.stats.currConnections}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Total Connections</div>
+                    <div class="col-md-6">{{cluster.stats.totalConnections}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">Current Items</div>
+                    <div class="col-md-6">{{cluster.stats.currItems}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Total Items</div>
+                    <div class="col-md-6">{{cluster.stats.totalItems}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">Get Requests</div>
+                    <div class="col-md-6">{{cluster.stats.cmdGet}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Set Requests</div>
+                    <div class="col-md-6">{{cluster.stats.cmdSet}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">Request Hits</div>
+                    <div class="col-md-6">{{cluster.stats.getHits}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Request Misses</div>
+                    <div class="col-md-6">{{cluster.stats.getMisses}}</div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script type="application/javascript">
+
+    var cacheDatasets = [
+        {
+            value: parseFloat( "{{ cluster.stats.bytesUsedPercentage }}" ),
+            color: "#D46234",
+            highlight: "#B04419",
+            label: "Used: {{ cluster.stats.bytes }} ({{cluster.stats.bytesUsedPercentage }}%)",
+            id: 'used'
+        },
+        {
+            value: parseFloat( "{{ cluster.stats.bytesFreePercentage }}" ),
+            color: "#60EF60",
+            highlight: "#8AF68A",
+            label: "Free: {{ cluster.stats.bytesFree }} ({{cluster.stats.bytesFreePercentage }}%)",
+            id: 'free'
+        }
+    ];
+
+    var cacheOptions = {
+        tooltipTemplate: "{% verbatim %}<%if (label){%><%= label %><%}%>{% endverbatim %}",
+        legendTemplate: "{% verbatim %}<ul class=\"legend\"><% for (var i=0; i<cacheDatasets.length; i++){%><li><div class=\"legend-container\"><div class=\"legend <%=cacheDatasets[i].id.toLowerCase()%>\"></div><%if(cacheDatasets[i].label){%><%=cacheDatasets[i].label%><%}%></div></li><%}%></ul>{% endverbatim %}"
+    };
+
+    var pieChart = new Chart( $( "#cacheUsage" ).get( 0 ).getContext( "2d" ) ).Pie( cacheDatasets, cacheOptions );
+
+    //append the legend
+    $( '#cacheUsageLegend' ).html( pieChart.generateLegend() );
+
+
+    var hitsData = {
+        labels: [""],
+        datasets: [
+            {
+                label: "Hits: {{ cluster.stats.getHits }} ({{ cluster.stats.getHitsPercentage }}%)",
+                fillColor: "#60EF60",
+                highlightFill: "#8AF68A",
+                data: ["{{ cluster.stats.getHits }}"],
+                id: "hits"
+            },
+            {
+                label: "Misses: {{ cluster.stats.getMisses }} ({{ cluster.stats.getMissesPercentage }}%)",
+                fillColor: "#D46234",
+                highlightFill: "#B04419",
+                data: ["{{ cluster.stats.getMisses }}"],
+                id: "misses"
+            }
+        ]
+    };
+
+    var hitsOptions = {
+        tooltipTemplate: "{% verbatim %}<%if (label){%><%= label %><%}%>{% endverbatim %}",
+        legendTemplate: "{% verbatim %}<ul class=\"legend\"><% for (var i=0; i<hitsData.datasets.length; i++){%><li><div class=\"legend-container\"><div class=\"legend <%=hitsData.datasets[i].id.toLowerCase()%>\"></div><%if(hitsData.datasets[i].label){%><%=hitsData.datasets[i].label%><%}%></div></li><%}%></ul>{% endverbatim %}"
+    };
+
+    var barChart = new Chart( $( "#hitsAndMisses" ).get( 0 ).getContext( "2d" ) ).Bar( hitsData, hitsOptions );
+
+    //append the legend
+    $( '#hitsAndMissesLegend' ).html( barChart.generateLegend() );
+
+</script>
 {% endblock %}

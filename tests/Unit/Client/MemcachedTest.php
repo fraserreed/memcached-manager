@@ -84,14 +84,14 @@ class MemcachedTest extends UnitTestCase
         $this->assertEquals( 10007, $stats->getCurrConnections() );
         $this->assertEquals( 10008, $stats->getTotalConnections() );
         $this->assertEquals( 10009, $stats->getConnectionStructures() );
-        $this->assertEquals( 10010, $stats->getBytes() );
+        $this->assertEquals( '10 Kb', $stats->getBytes() );
         $this->assertEquals( 10011, $stats->getCmdGet() );
         $this->assertEquals( 10012, $stats->getCmdSet() );
         $this->assertEquals( 10013, $stats->getGetHits() );
         $this->assertEquals( 10014, $stats->getGetMisses() );
         $this->assertEquals( 10015, $stats->getEvictions() );
-        $this->assertEquals( 10016, $stats->getBytesRead() );
-        $this->assertEquals( 10017, $stats->getBytesWritten() );
+        $this->assertEquals( '10 Kb', $stats->getBytesRead() );
+        $this->assertEquals( '10 Kb', $stats->getBytesWritten() );
     }
 
     public function testGetServers()

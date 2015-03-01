@@ -4,6 +4,7 @@ namespace MemcachedManager\Memcached;
 
 
 use MemcachedManager\Utils\Time;
+use MemcachedManager\Utils\Units;
 
 class Stats
 {
@@ -263,16 +264,87 @@ class Stats
      */
     public function getLimitMaxsize()
     {
-        $size = $this->getLimitMaxbytes();
+        return Units::readableSize( $this->getLimitMaxbytes() );
+    }
 
-        if( $size >= 1 << 30 )
-            return number_format( $size / ( 1 << 30 ), 2 ) . " Gb";
-        if( $size >= 1 << 20 )
-            return number_format( $size / ( 1 << 20 ), 0 ) . " Mb";
-        if( $size >= 1 << 10 )
-            return number_format( $size / ( 1 << 10 ), 0 ) . " Kb";
+    /**
+     * @param int $bytes
+     */
+    public function setBytes( $bytes )
+    {
+        $this->bytes = (int) $bytes;
+    }
 
-        return number_format( $size ) . " bytes";
+    /**
+     * @return int
+     */
+    public function getBytes()
+    {
+        return Units::readableSize( $this->bytes );
+    }
+
+    /**
+     * @return int
+     */
+    public function getRawBytes()
+    {
+        return $this->bytes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBytesFree()
+    {
+        return Units::readableSize( $this->getLimitMaxbytes() - $this->getRawBytes() );
+    }
+
+    /**
+     * @return float
+     */
+    public function getBytesFreePercentage()
+    {
+        return $this->getLimitMaxbytes() ? number_format( 100 * ( 1 - ( $this->getRawBytes() / $this->getLimitMaxbytes() ) ), 2 ) : 0;
+    }
+
+    /**
+     * @return float
+     */
+    public function getBytesUsedPercentage()
+    {
+        return $this->getLimitMaxbytes() ? number_format( 100 * ( $this->getRawBytes() / $this->getLimitMaxbytes() ), 2 ) : 0;
+    }
+
+    /**
+     * @param int $bytesRead
+     */
+    public function setBytesRead( $bytesRead )
+    {
+        $this->bytesRead = (int) $bytesRead;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBytesRead()
+    {
+        return Units::readableSize( $this->bytesRead );
+    }
+
+    /**
+     * @param int $bytesWritten
+     */
+    public function setBytesWritten( $bytesWritten )
+    {
+        $this->bytesWritten = (int) $bytesWritten;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBytesWritten()
+    {
+        return Units::readableSize( $this->bytesWritten );
     }
 
     /**
@@ -324,22 +396,6 @@ class Stats
     }
 
     /**
-     * @param int $bytes
-     */
-    public function setBytes( $bytes )
-    {
-        $this->bytes = (int) $bytes;
-    }
-
-    /**
-     * @return int
-     */
-    public function getBytes()
-    {
-        return $this->bytes;
-    }
-
-    /**
      * @param int $cmdGet
      */
     public function setCmdGet( $cmdGet )
@@ -388,6 +444,14 @@ class Stats
     }
 
     /**
+     * @return float
+     */
+    public function getGetHitsPercentage()
+    {
+        return number_format( ( $this->getGetHits() / ( $this->getGetHits() + $this->getGetMisses() ) ) * 100, 2 );
+    }
+
+    /**
      * @param int $getMisses
      */
     public function setGetMisses( $getMisses )
@@ -404,6 +468,14 @@ class Stats
     }
 
     /**
+     * @return float
+     */
+    public function getGetMissesPercentage()
+    {
+        return number_format( ( $this->getGetMisses() / ( $this->getGetHits() + $this->getGetMisses() ) ) * 100, 2 );
+    }
+
+    /**
      * @param int $evictions
      */
     public function setEvictions( $evictions )
@@ -417,37 +489,5 @@ class Stats
     public function getEvictions()
     {
         return $this->evictions;
-    }
-
-    /**
-     * @param int $bytesRead
-     */
-    public function setBytesRead( $bytesRead )
-    {
-        $this->bytesRead = (int) $bytesRead;
-    }
-
-    /**
-     * @return int
-     */
-    public function getBytesRead()
-    {
-        return $this->bytesRead;
-    }
-
-    /**
-     * @param int $bytesWritten
-     */
-    public function setBytesWritten( $bytesWritten )
-    {
-        $this->bytesWritten = (int) $bytesWritten;
-    }
-
-    /**
-     * @return int
-     */
-    public function getBytesWritten()
-    {
-        return $this->bytesWritten;
     }
 }

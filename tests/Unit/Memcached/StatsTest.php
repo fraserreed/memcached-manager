@@ -173,9 +173,36 @@ class StatsTest extends UnitTestCase
     {
         $stats = new Stats();
 
-        $this->assertEquals( 0, $stats->getBytes() );
+        $this->assertEquals( '0 bytes', $stats->getBytes() );
         $stats->setBytes( 1099 );
-        $this->assertEquals( 1099, $stats->getBytes() );
+        $this->assertEquals( '1 Kb', $stats->getBytes() );
+        $this->assertEquals( 1099, $stats->getRawBytes() );
+    }
+
+    public function testGetBytesFreeUsed()
+    {
+        $stats = new Stats();
+
+        $this->assertEquals( '0 bytes', $stats->getBytesFree() );
+        $this->assertEquals( 0, $stats->getBytesFreePercentage() );
+        $this->assertEquals( 0, $stats->getBytesUsedPercentage() );
+
+        $stats->setBytes( 10000 );
+        $stats->setLimitMaxbytes( 200000 );
+
+        $this->assertEquals( '186 Kb', $stats->getBytesFree() );
+        $this->assertEquals( 95, $stats->getBytesFreePercentage() );
+        $this->assertEquals( 5, $stats->getBytesUsedPercentage() );
+
+        $stats->setBytes( 152000 );
+        $this->assertEquals( '47 Kb', $stats->getBytesFree() );
+        $this->assertEquals( 24, $stats->getBytesFreePercentage() );
+        $this->assertEquals( 76, $stats->getBytesUsedPercentage() );
+
+        $stats->setBytes( 196000 );
+        $this->assertEquals( '4 Kb', $stats->getBytesFree() );
+        $this->assertEquals( 2, $stats->getBytesFreePercentage() );
+        $this->assertEquals( 98, $stats->getBytesUsedPercentage() );
     }
 
     public function testSetGetCmdGet()
@@ -203,6 +230,13 @@ class StatsTest extends UnitTestCase
         $this->assertEquals( 0, $stats->getGetHits() );
         $stats->setGetHits( 1399 );
         $this->assertEquals( 1399, $stats->getGetHits() );
+
+        $this->assertEquals( 100, $stats->getGetHitsPercentage() );
+
+        $stats->setGetMisses( 129 );
+        $this->assertEquals( 91.56, $stats->getGetHitsPercentage() );
+        $stats->setGetMisses( 700 );
+        $this->assertEquals( 66.65, $stats->getGetHitsPercentage() );
     }
 
     public function testSetGetGetMisses()
@@ -212,6 +246,13 @@ class StatsTest extends UnitTestCase
         $this->assertEquals( 0, $stats->getGetMisses() );
         $stats->setGetMisses( 1499 );
         $this->assertEquals( 1499, $stats->getGetMisses() );
+
+        $this->assertEquals( 100, $stats->getGetMissesPercentage() );
+        $stats->setGetHits( 129 );
+        $this->assertEquals( 92.08, $stats->getGetMissesPercentage() );
+        $stats->setGetHits( 700 );
+        $this->assertEquals( 68.17, $stats->getGetMissesPercentage() );
+
     }
 
     public function testSetGetEvictions()
@@ -227,17 +268,17 @@ class StatsTest extends UnitTestCase
     {
         $stats = new Stats();
 
-        $this->assertEquals( 0, $stats->getBytesRead() );
+        $this->assertEquals( '0 bytes', $stats->getBytesRead() );
         $stats->setBytesRead( 1699 );
-        $this->assertEquals( 1699, $stats->getBytesRead() );
+        $this->assertEquals( '2 Kb', $stats->getBytesRead() );
     }
 
     public function testSetGetBytesWritten()
     {
         $stats = new Stats();
 
-        $this->assertEquals( 0, $stats->getBytesWritten() );
+        $this->assertEquals( '0 bytes', $stats->getBytesWritten() );
         $stats->setBytesWritten( 1799 );
-        $this->assertEquals( 1799, $stats->getBytesWritten() );
+        $this->assertEquals( '2 Kb', $stats->getBytesWritten() );
     }
 }
