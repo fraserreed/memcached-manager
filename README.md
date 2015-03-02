@@ -51,10 +51,44 @@ Next, run the Composer command to install the latest stable version of Guzzle:
 composer require fraserreed/memcached-manager
 ```
 
-After installing, you need to require Composer's autoloader:
+### Configuration
+
+After installing, you will need to configure the Memcached clusters and nodes to connect to.
+
+Alter the file ``config/config.local.php`` to include the appropriate connection information:
 
 ```
-require 'vendor/autoload.php';
+    'memcached'  => array(
+        'cluster1' => array(
+            array(
+                'cluster' => 'local',
+                'name'    => 'local1',
+                'host'    => 'localhost-one',
+                'port'    => 11211
+            ),
+            array(
+                'cluster' => 'local',
+                'name'    => 'local2',
+                'host'    => 'localhost-two',
+                'port'    => 11211
+            )
+        ),
+        'cluster2' => array(
+            array(
+                'cluster' => 'local',
+                'name'    => 'local1',
+                'host'    => 'localhost-one.other.com',
+                'port'    => 11211
+            ),
+            array(
+                'cluster' => 'local',
+                'name'    => 'local2',
+                'host'    => 'localhost-two.other.com',
+                'port'    => 11211
+            )
+        )
+
+    )
 ```
 
 ### Contribution
