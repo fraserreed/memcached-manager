@@ -4,6 +4,7 @@ namespace MemcachedManager\Tests\Unit\Client;
 
 
 use MemcachedManager\Client\Direct;
+use MemcachedManager\Memcached\Node;
 use MemcachedManager\Tests\Fixtures\MockSocket;
 use MemcachedManager\Tests\Unit\UnitTestCase;
 
@@ -44,7 +45,7 @@ class DirectTest extends UnitTestCase
         $direct = new Direct( array( array( 'host' => 'localhost', 'port' => 11200 ) ) );
         $direct->setConnection( 'localhost', 11200, $socket );
 
-        $this->assertEmpty( $direct->getKeys() );
+        $this->assertEmpty( $direct->getKeys( array() ) );
     }
 
     public function testGetKeysEmpty()
@@ -55,7 +56,7 @@ class DirectTest extends UnitTestCase
         $direct = new Direct( array( array( 'host' => 'localhost', 'port' => 11200 ) ) );
         $direct->setConnection( 'localhost', 11200, $socket );
 
-        $this->assertEmpty( $direct->getKeys() );
+        $this->assertEmpty( $direct->getKeys( array() ) );
     }
 
     public function testGetKeysOneSlabEmpty()
@@ -67,7 +68,7 @@ class DirectTest extends UnitTestCase
         $direct = new Direct( array( array( 'host' => 'localhost', 'port' => 11200 ) ) );
         $direct->setConnection( 'localhost', 11200, $socket );
 
-        $this->assertEmpty( $direct->getKeys() );
+        $this->assertEmpty( $direct->getKeys( array() ) );
     }
 
     public function testGetKeysTwoSlabsEmpty()
@@ -80,7 +81,7 @@ class DirectTest extends UnitTestCase
         $direct = new Direct( array( array( 'host' => 'localhost', 'port' => 11200 ) ) );
         $direct->setConnection( 'localhost', 11200, $socket );
 
-        $this->assertEmpty( $direct->getKeys() );
+        $this->assertEmpty( $direct->getKeys( array() ) );
     }
 
     public function testGetKeysOneSlabsOneItemOneKey()
@@ -93,7 +94,7 @@ class DirectTest extends UnitTestCase
         $direct = new Direct( array( array( 'host' => 'localhost', 'port' => 11200 ) ) );
         $direct->setConnection( 'localhost', 11200, $socket );
 
-        $this->assertEquals( array( 'dimensions_31' => array( 'key' => 'dimensions_31' ) ), $direct->getKeys() );
+        $this->assertEquals( array( 'dimensions_31' => array( 'key' => 'dimensions_31' ) ), $direct->getKeys( array( new Node( 'localhost', 11200 ) ) ) );
     }
 
     public function testGetKeys()
@@ -120,7 +121,7 @@ class DirectTest extends UnitTestCase
             'dimensions_38' => array( 'key' => 'dimensions_38' )
         );
 
-        $this->assertEquals( $keys, $direct->getKeys() );
+        $this->assertEquals( $keys, $direct->getKeys( array( new Node( 'localhost', 11200 ) ) ) );
     }
 
     /**

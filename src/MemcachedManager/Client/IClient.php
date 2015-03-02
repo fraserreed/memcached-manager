@@ -26,7 +26,7 @@ interface IClient
     /**
      * @return \MemcachedManager\Memcached\KeyStore
      */
-    public function getKeys();
+    public function getKeys( array $nodes );
 
     /**
      * @param $key

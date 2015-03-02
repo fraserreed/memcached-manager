@@ -94,16 +94,36 @@ class MemcachedTest extends UnitTestCase
         $this->assertEquals( '10 Kb', $stats->getBytesWritten() );
     }
 
-    public function testGetServers()
-    {
-        $memcached = new Memcached( array( array( 'host' => 'localhost', 'port' => 11211 ) ) );
-        $this->assertEquals( array( array( 'host' => 'localhost', 'port' => 11211 ) ), $memcached->getServers() );
-    }
-
     public function testGetDirectClient()
     {
         $memcached = new Memcached( array( array( 'host' => 'localhost', 'port' => 11211 ) ) );
         $this->assertEquals( new Direct( array( array( 'host' => 'localhost', 'port' => 11211 ) ) ), $memcached->getDirectClient() );
+    }
+
+    public function testAddServers()
+    {
+        $baseClass = new MockMemcached();
+
+        $memcached = new Memcached( array() );
+        $memcached->setClientClass( $baseClass );
+
+        $memcached->addServer( 'localhost', 11021 );
+
+        $this->assertEquals( array( 'localhost' => array( 11021 => true ) ), $memcached->getServers() );
+    }
+
+    public function testClearServers()
+    {
+        $baseClass = new MockMemcached();
+
+        $memcached = new Memcached( array() );
+        $memcached->setClientClass( $baseClass );
+
+        $this->assertInstanceOf( '\MemcachedManager\Tests\Fixtures\MockMemcached', $memcached->getClientClass() );
+
+        $memcached->clearServers();
+
+        $this->assertInstanceOf( '\Memcached', $memcached->getClientClass() );
     }
 
     public function testTestPass()
@@ -136,11 +156,11 @@ class MemcachedTest extends UnitTestCase
 
         $memcached->addKey( 'keytest', 'valuetest' );
 
-        $this->assertEquals( array( 'keytest' => 'valuetest' ), $memcached->getKeys() );
+        $this->assertEquals( array( 'keytest' => 'valuetest' ), $memcached->getKeys( array() ) );
 
         $memcached->editKey( 'keytest', 'not the same value' );
 
-        $this->assertEquals( array( 'keytest' => 'not the same value' ), $memcached->getKeys() );
+        $this->assertEquals( array( 'keytest' => 'not the same value' ), $memcached->getKeys( array() ) );
 
         $this->assertEquals( 'not the same value', $memcached->getKey( 'keytest' ) );
 
@@ -158,20 +178,20 @@ class MemcachedTest extends UnitTestCase
 
         $memcached->addKey( 'keytest', 12 );
 
-        $this->assertEquals( array( 'keytest' => 12 ), $memcached->getKeys() );
+        $this->assertEquals( array( 'keytest' => 12 ), $memcached->getKeys( array() ) );
 
         $memcached->incrementKey( 'keytest' );
 
-        $this->assertEquals( array( 'keytest' => 13 ), $memcached->getKeys() );
+        $this->assertEquals( array( 'keytest' => 13 ), $memcached->getKeys( array() ) );
 
         $memcached->incrementKey( 'keytest' );
 
         $memcached->incrementKey( 'keytest' );
 
-        $this->assertEquals( array( 'keytest' => 15 ), $memcached->getKeys() );
+        $this->assertEquals( array( 'keytest' => 15 ), $memcached->getKeys( array() ) );
 
         $memcached->decrementKey( 'keytest' );
 
-        $this->assertEquals( array( 'keytest' => 14 ), $memcached->getKeys() );
+        $this->assertEquals( array( 'keytest' => 14 ), $memcached->getKeys( array() ) );
     }
 }

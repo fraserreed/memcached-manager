@@ -114,16 +114,17 @@ class Memcached extends AbstractClient
     /**
      * Retrieve all keys from the data source
      *
+     * @param array $nodes
+     *
      * @return array
      */
-    public function getKeys()
+    public function getKeys( array $nodes )
     {
         /** @var $client \Memcached */
         $client = $this->getClient();
 
         if( method_exists( $client, 'getAllKeys' ) )
         {
-
             $client->getDelayed( $client->getAllKeys(), true );
 
             return $client->fetchAll();
@@ -132,7 +133,7 @@ class Memcached extends AbstractClient
         //if the memcached implementation does not support getAllKeys, directly connect to get information
         $client = $this->getDirectClient();
 
-        if( $keys = $client->getKeys() )
+        if( $keys = $client->getKeys( $nodes ) )
         {
             foreach( $keys as &$key )
             {

@@ -30,6 +30,11 @@ class MockMemcached implements IClient
         $this->servers[ $host ][ $port ] = true;
     }
 
+    public function clearServers()
+    {
+        $this->servers = array();
+    }
+
     public function setStats( $stats )
     {
         $this->stats = $stats;
@@ -49,9 +54,11 @@ class MockMemcached implements IClient
     }
 
     /**
+     * @param array $nodes
+     *
      * @return array
      */
-    public function getKeys()
+    public function getKeys( array $nodes )
     {
         return $this->getAllKeys();
     }

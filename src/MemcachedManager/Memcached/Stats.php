@@ -448,7 +448,7 @@ class Stats
      */
     public function getGetHitsPercentage()
     {
-        return number_format( ( $this->getGetHits() / ( $this->getGetHits() + $this->getGetMisses() ) ) * 100, 2 );
+        return ( $this->getGetHits() + $this->getGetMisses() > 0 ) ? number_format( ( $this->getGetHits() / ( $this->getGetHits() + $this->getGetMisses() ) ) * 100, 2 ) : 0;
     }
 
     /**
@@ -472,7 +472,7 @@ class Stats
      */
     public function getGetMissesPercentage()
     {
-        return number_format( ( $this->getGetMisses() / ( $this->getGetHits() + $this->getGetMisses() ) ) * 100, 2 );
+        return ( $this->getGetHits() + $this->getGetMisses() > 0 ) ? number_format( ( $this->getGetMisses() / ( $this->getGetHits() + $this->getGetMisses() ) ) * 100, 2 ) : 0;
     }
 
     /**

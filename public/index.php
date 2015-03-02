@@ -53,12 +53,6 @@ $app->group( '/cluster', function () use ( $app )
     // get cluster properties
     $app->get( '/:clusterName', function ( $clusterName ) use ( $app )
     {
-//        $t = $app->memcached->getCluster( $clusterName );
-//
-//        echo "<pre>";
-//        print_r( $t );
-//        die();
-
         // Render cluster view
         $app->render( 'pages/cluster.html', array( 'clusterName' => $clusterName, 'cluster' => $app->memcached->getCluster( $clusterName ) ) );
     } );
@@ -76,8 +70,7 @@ $app->group( '/cluster', function () use ( $app )
         // add key
         $app->post( '/add', function ( $clusterName ) use ( $app )
         {
-            $app->memcached->addKey( /*$clusterName,*/
-                $app->request->post( 'key' ), $app->request->post( 'value' ) );
+            $app->memcached->addKey( $clusterName, $app->request->post( 'key' ), $app->request->post( 'value' ) );
 
             // Redirect to cluster view
             $app->redirect( '/cluster/' . $clusterName . '/keys' );
@@ -87,13 +80,13 @@ $app->group( '/cluster', function () use ( $app )
         $app->get( '/edit/:key', function ( $clusterName, $key ) use ( $app )
         {
             // Render node view
-            $app->render( 'pages/keys/edit.html', array( 'clusterName' => $clusterName, 'key' => $app->memcached->getKey( $key ) ) );
+            $app->render( 'pages/keys/edit.html', array( 'clusterName' => $clusterName, 'key' => $app->memcached->getKey( $clusterName, $key ) ) );
         } );
 
         // add key
         $app->post( '/edit', function ( $clusterName ) use ( $app )
         {
-            $app->memcached->editKey( $app->request->post( 'key' ), $app->request->post( 'value' ) );
+            $app->memcached->editKey( $clusterName, $app->request->post( 'key' ), $app->request->post( 'value' ) );
 
             // Redirect to cluster view
             $app->redirect( '/cluster/' . $clusterName . '/keys' );
@@ -102,7 +95,7 @@ $app->group( '/cluster', function () use ( $app )
         // increment key
         $app->get( '/increment/:key', function ( $clusterName, $key ) use ( $app )
         {
-            $app->memcached->incrementKey( $key );
+            $app->memcached->incrementKey( $clusterName, $key );
 
             // Redirect to cluster view
             $app->redirect( '/cluster/' . $clusterName . '/keys' );
@@ -111,7 +104,7 @@ $app->group( '/cluster', function () use ( $app )
         // decrement key
         $app->get( '/decrement/:key', function ( $clusterName, $key ) use ( $app )
         {
-            $app->memcached->decrementKey( $key );
+            $app->memcached->decrementKey( $clusterName, $key );
 
             // Redirect to cluster view
             $app->redirect( '/cluster/' . $clusterName . '/keys' );
@@ -120,7 +113,7 @@ $app->group( '/cluster', function () use ( $app )
         // delete key
         $app->get( '/delete/:key', function ( $clusterName, $key ) use ( $app )
         {
-            $app->memcached->deleteKey( $key );
+            $app->memcached->deleteKey( $clusterName, $key );
 
             // Redirect to cluster view
             $app->redirect( '/cluster/' . $clusterName . '/keys' );

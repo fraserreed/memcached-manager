@@ -8,19 +8,9 @@ use MemcachedManager\Memcached\Stats;
 abstract class AbstractClient implements IClient
 {
     /**
-     * @var array
-     */
-    private $servers;
-
-    /**
      * @var mixed
      */
     protected $clientClass;
-
-    public function __construct( array $servers )
-    {
-        $this->servers = $servers;
-    }
 
     /**
      * @return IClient
@@ -39,19 +29,7 @@ abstract class AbstractClient implements IClient
 
     public function getClient()
     {
-        $client = $this->getClientClass();
-
-        if( !empty( $this->servers ) )
-        {
-            /** @var $server \MemcachedManager\Memcached\Node */
-            foreach( $this->servers as $server )
-            {
-                //$client->addServer( $server->getHost(), $server->getPort() );
-                $client->addServer( $server[ 'host' ], $server[ 'port' ] );
-            }
-        }
-
-        return $client;
+        return $this->getClientClass();
     }
 
     /**
@@ -59,15 +37,32 @@ abstract class AbstractClient implements IClient
      */
     public function getDirectClient()
     {
-        return new Direct( $this->servers );
+        return new Direct();
     }
 
     /**
-     * @return array
+     * @param $host
+     * @param $port
+     */
+    public function addServer( $host, $port )
+    {
+        $this->getClient()->addServer( $host, $port );
+    }
+
+    /**
+     * @return mixed
      */
     public function getServers()
     {
-        return $this->servers;
+        return $this->getClient()->getServers();
+    }
+
+    /**
+     * Reset the server list for the client connection
+     */
+    public function clearServers()
+    {
+        $this->clientClass = null;
     }
 
     /**

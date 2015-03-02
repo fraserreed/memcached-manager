@@ -71,13 +71,14 @@ class Direct extends AbstractClient
      * @throws NotImplementedException
      * @return array
      */
-    public function getKeys()
+    public function getKeys( array $nodes )
     {
         $keys = array();
 
-        foreach( $this->getServers() as $server )
+        /** @var $node \MemcachedManager\Memcached\Node */
+        foreach( $nodes as $node )
         {
-            $connection = $this->getConnection( $server[ 'host' ], $server[ 'port' ] );
+            $connection = $this->getConnection( $node->getHost(), $node->getPort() );
 
             $slabs = $this->processRawResponse( '/^STAT\s(\d+)\:(\w+)\s(\d+)/', $connection->execute( 'stats slabs' ) );
 
@@ -92,6 +93,9 @@ class Direct extends AbstractClient
                         foreach( $items as $itemId => $item )
                         {
                             $keys = $this->processRawKeys( $keys, $connection->execute( 'stats cachedump ' . $itemId . ' 0' ) );
+
+                            if ( count( $keys ) > 20 )
+                                break( 3 );
                         }
                     }
                 }

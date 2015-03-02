@@ -25,23 +25,31 @@ class Client
      */
     protected $clusters = array();
 
-    public function __construct( $servers, $clientClass = null )
+    /**
+     * @param      $clusters
+     * @param null $clientClass
+     *
+     * @throws ClientNotFoundException
+     */
+    public function __construct( $clusters, $clientClass = null )
     {
+        $this->clusters = $clusters;
+
         if( $clientClass )
         {
-            $this->client = new $clientClass( $servers );
+            $this->client = new $clientClass();
         }
         else
         {
             //determine the storage type
             if( class_exists( 'Memcached' ) )
             {
-                $this->client = new Memcached( $servers );
+                $this->client = new Memcached();
             }
 
             if( !$this->client && class_exists( 'Memcache' ) )
             {
-                $this->client = new Memcache( $servers );
+                $this->client = new Memcache();
             }
         }
 
@@ -55,6 +63,23 @@ class Client
     private function getClient()
     {
         return $this->client;
+    }
+
+    /**
+     * @param IClient $client
+     * @param array   $nodes
+     *
+     * @return IClient
+     */
+    private function processNodes( IClient $client, array $nodes )
+    {
+        $client->clearServers();
+
+        /** @var $node \MemcachedManager\Memcached\Node */
+        foreach( $nodes as $node )
+            $client->addServer( $node->getHost(), $node->getPort() );
+
+        return $client;
     }
 
     /**
@@ -75,33 +100,28 @@ class Client
      */
     public function getClusters()
     {
-        $client = $this->getClient();
+        $populatedClusters = array();
 
-        if( empty( $this->clusters ) )
+        if( !empty( $this->clusters ) )
         {
-            foreach( $client->getServers() as $server )
+            foreach( $this->clusters as $clusterName => $servers )
             {
                 //if this is the first node in the cluster, initialize the cluster
-                if( !isset( $this->clusters[ $server[ 'cluster' ] ] ) )
-                    $this->clusters[ $server[ 'cluster' ] ] = new Cluster( $server[ 'cluster' ] );
+                if( !isset( $populatedClusters[ $clusterName ] ) )
+                    $populatedClusters[ $clusterName ] = new Cluster( $clusterName );
 
-                $node = new Node( $server[ 'host' ], $server[ 'port' ], isset( $server[ 'name' ] ) ? $server[ 'name' ] : $server[ 'host' ] );
-                $node->setAlive( $this->testConnection( $node ) );
+                foreach( $servers as $server )
+                {
+                    $node = new Node( $server[ 'host' ], $server[ 'port' ], isset( $server[ 'name' ] ) ? $server[ 'name' ] : $server[ 'host' ] );
+                    $node->setAlive( $this->testConnection( $node ) );
 
-                //add the node to the cluster
-                $this->clusters[ $server[ 'cluster' ] ]->addNode( $node );
-            }
-
-            //prime the cluster stats
-            /** @var $cluster \MemcachedManager\Memcached\Cluster */
-            foreach( $this->clusters as $cluster )
-            {
-                if( $stats = $this->getClient()->getStats() )
-                    $cluster->setStats( $stats );
+                    //add the node to the cluster
+                    $populatedClusters[ $clusterName ]->addNode( $node );
+                }
             }
         }
 
-        return $this->clusters;
+        return $populatedClusters;
     }
 
     /**
@@ -115,7 +135,15 @@ class Client
     {
         $clusters = $this->getClusters();
 
-        return isset( $clusters[ $clusterName ] ) ? $clusters[ $clusterName ] : null;
+        if( $cluster = isset( $clusters[ $clusterName ] ) ? $clusters[ $clusterName ] : null )
+        {
+            $client = $this->processNodes( $this->getClient(), $cluster->getNodes() );
+
+            if( $stats = $client->getStats() )
+                $cluster->setStats( $stats );
+        }
+
+        return $cluster;
     }
 
     /**
@@ -146,43 +174,52 @@ class Client
     /**
      * Proxy function for adding a key to the data source
      *
+     * @param $clusterName
      * @param $key
      * @param $value
      *
      * @return mixed
-     * @throws ClientNotFoundException
      */
-    public function addKey( $key, $value )
+    public function addKey( $clusterName, $key, $value )
     {
-        $this->getClient()->addKey( $key, $value );
+        $cluster = $this->getCluster( $clusterName );
+        $client  = $this->processNodes( $this->getClient(), $cluster->getNodes() );
+
+        $client->addKey( $key, $value );
     }
 
     /**
      * Proxy function for editing a key in the data source
      *
+     * @param $clusterName
      * @param $key
      * @param $value
      *
-     * @throws ClientNotFoundException
      */
-    public function editKey( $key, $value )
+    public function editKey( $clusterName, $key, $value )
     {
-        $this->getClient()->editKey( Hash::decode( $key ), $value );
+        $cluster = $this->getCluster( $clusterName );
+        $client  = $this->processNodes( $this->getClient(), $cluster->getNodes() );
+
+        $client->editKey( Hash::decode( $key ), $value );
     }
 
     /**
      * Proxy function for getting a key from the data source
      *
+     * @param $clusterName
      * @param $key
      *
-     * @return \MemcachedManager\Memcached\Key|null
-     * @throws ClientNotFoundException
+     * @return Key|null
      */
-    public function getKey( $key )
+    public function getKey( $clusterName, $key )
     {
         $decodedKey = Hash::decode( $key );
 
-        if( $value = $this->getClient()->getKey( $decodedKey ) )
+        $cluster = $this->getCluster( $clusterName );
+        $client  = $this->processNodes( $this->getClient(), $cluster->getNodes() );
+
+        if( $value = $client->getKey( $decodedKey ) )
         {
             $object = new Key();
             $object->setKey( $decodedKey );
@@ -197,38 +234,45 @@ class Client
     /**
      * Proxy function for purging a key from the data source
      *
+     * @param $clusterName
      * @param $key
      *
      * @return mixed
-     * @throws ClientNotFoundException
      */
-    public function deleteKey( $key )
+    public function deleteKey( $clusterName, $key )
     {
-        $this->getClient()->deleteKey( Hash::decode( $key ) );
+        $cluster = $this->getCluster( $clusterName );
+        $client  = $this->processNodes( $this->getClient(), $cluster->getNodes() );
+
+        $client->deleteKey( Hash::decode( $key ) );
     }
 
     /**
      * Proxy function for incrementing a key's value in the data source
      *
+     * @param $clusterName
      * @param $key
-     *
-     * @throws ClientNotFoundException
      */
-    public function incrementKey( $key )
+    public function incrementKey( $clusterName, $key )
     {
-        $this->getClient()->incrementKey( Hash::decode( $key ) );
+        $cluster = $this->getCluster( $clusterName );
+        $client  = $this->processNodes( $this->getClient(), $cluster->getNodes() );
+
+        $client->incrementKey( Hash::decode( $key ) );
     }
 
     /**
      * Proxy function for decrementing a key's value in the data source
      *
+     * @param $clusterName
      * @param $key
-     *
-     * @throws ClientNotFoundException
      */
-    public function decrementKey( $key )
+    public function decrementKey( $clusterName, $key )
     {
-        $this->getClient()->decrementKey( Hash::decode( $key ) );
+        $cluster = $this->getCluster( $clusterName );
+        $client  = $this->processNodes( $this->getClient(), $cluster->getNodes() );
+
+        $client->decrementKey( Hash::decode( $key ) );
     }
 
     /**
@@ -242,6 +286,23 @@ class Client
      */
     public function getAllKeys( $clusterName, $nodeName = '' )
     {
-        return new KeyStore( $this->getClient()->getKeys() );
+        $cluster = $this->getCluster( $clusterName );
+
+        $nodes = $cluster->getNodes();
+
+        if( $nodeName )
+        {
+            /** @var $node \MemcachedManager\Memcached\Node */
+            foreach( $nodes as $node )
+            {
+                if( $node->getName() == $nodeName )
+                {
+                    $nodes = array( $node );
+                    break;
+                }
+            }
+        }
+
+        return new KeyStore( $this->getClient()->getKeys( $nodes ) );
     }
 }
