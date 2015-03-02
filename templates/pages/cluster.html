@@ -42,83 +42,33 @@
 
             <div class="col-sm-12">
 
-                {% if stats.pid %}
                 <div class="row">
-                    <div class="col-md-6">Memcached Version</div>
-                    <div class="col-md-6">{{cluster.stats.version}}</div>
+                    <div class="col-md-6">Current Items (Total)</div>
+                    <div class="col-md-6">{{cluster.stats.currItems}} ( {{cluster.stats.totalItems}} )</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">Process ID</div>
-                    <div class="col-md-6">{{cluster.stats.pid}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">Uptime</div>
-                    <div class="col-md-6">{{cluster.stats.uptime}}</div>
-                </div>
-                {% else %}
-                <div class="row">
-                    <div class="col-md-6">Active Nodes</div>
-                    <div class="col-md-6">{{cluster.stats.activeNodes}}</div>
-                </div>
-                {% endif %}
-
-                <div class="row">
-                    <div class="col-md-6">Maximum Size</div>
-                    <div class="col-md-6">{{cluster.stats.limitMaxsize}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">Bytes</div>
-                    <div class="col-md-6">{{cluster.stats.bytes}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">Bytes Read</div>
-                    <div class="col-md-6">{{cluster.stats.bytesRead}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">Bytes Written</div>
-                    <div class="col-md-6">{{cluster.stats.bytesWritten}}</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">Threads</div>
-                    <div class="col-md-6">{{cluster.stats.threads}}</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">Current Connections</div>
-                    <div class="col-md-6">{{cluster.stats.currConnections}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">Total Connections</div>
-                    <div class="col-md-6">{{cluster.stats.totalConnections}}</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">Current Items</div>
-                    <div class="col-md-6">{{cluster.stats.currItems}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">Total Items</div>
-                    <div class="col-md-6">{{cluster.stats.totalItems}}</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">Get Requests</div>
-                    <div class="col-md-6">{{cluster.stats.cmdGet}}</div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">Set Requests</div>
-                    <div class="col-md-6">{{cluster.stats.cmdSet}}</div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">Request Hits</div>
+                    <div class="col-md-6">Hits</div>
                     <div class="col-md-6">{{cluster.stats.getHits}}</div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6">Request Misses</div>
+                    <div class="col-md-6">Misses</div>
                     <div class="col-md-6">{{cluster.stats.getMisses}}</div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">Request Rate ( hits, misses )</div>
+                    <div class="col-md-6">{{cluster.stats.getRequestRate}} cache requests / second</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Hit Rate</div>
+                    <div class="col-md-6">{{cluster.stats.getHitRate}} cache requests / second</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">Miss Rate</div>
+                    <div class="col-md-6">{{cluster.stats.getMissRate}} cache requests / second</div>
+                </div>
+
+
+
             </div>
         </div>
 

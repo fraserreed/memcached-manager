@@ -252,7 +252,23 @@ class StatsTest extends UnitTestCase
         $this->assertEquals( 92.08, $stats->getGetMissesPercentage() );
         $stats->setGetHits( 700 );
         $this->assertEquals( 68.17, $stats->getGetMissesPercentage() );
+    }
 
+    public function testGetRates()
+    {
+        $stats = new Stats();
+
+        $this->assertEquals( 0, $stats->getRequestRate() );
+        $this->assertEquals( 0, $stats->getHitRate() );
+        $this->assertEquals( 0, $stats->getMissRate() );
+
+        $stats->setUptime( 200 );
+        $stats->setGetHits( 120 );
+        $stats->setGetMisses( 240 );
+
+        $this->assertEquals( 1.8, $stats->getRequestRate() );
+        $this->assertEquals( 0.6, $stats->getHitRate() );
+        $this->assertEquals( 1.2, $stats->getMissRate() );
     }
 
     public function testSetGetEvictions()

@@ -476,6 +476,30 @@ class Stats
     }
 
     /**
+     * @return float
+     */
+    public function getRequestRate()
+    {
+        return ( $this->uptime > 0 ) ? number_format( ( $this->getGetHits() + $this->getGetMisses() ) / $this->uptime, 2 ) : 0;
+    }
+
+    /**
+     * @return float
+     */
+    public function getHitRate()
+    {
+        return ( $this->uptime > 0 ) ? number_format( $this->getGetHits() / $this->uptime, 2 ) : 0;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMissRate()
+    {
+        return ( $this->uptime > 0 ) ? number_format( $this->getGetMisses() / $this->uptime, 2 ) : 0;
+    }
+
+    /**
      * @param int $evictions
      */
     public function setEvictions( $evictions )
