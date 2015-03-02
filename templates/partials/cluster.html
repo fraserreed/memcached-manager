@@ -8,17 +8,17 @@
         {% endif %}
 
         <div class="row">
-            <div class="col-md-3"><b>Name</b></div>
-            <div class="col-md-3"><b>Host</b></div>
-            <div class="col-md-3"><b>Port</b></div>
-            <div class="col-md-3"><b>Health Check</b></div>
+            <div class="col-md-4 col-sm-3"><b>Name</b></div>
+            <div class="col-md-5 col-sm-6"><b>Host</b></div>
+            <div class="col-md-1 col-sm-1"><b>Port</b></div>
+            <div class="col-md-2 col-sm-2"><b>Health Check</b></div>
         </div>
         {% for node in cluster.nodes %}
         <div class="row">
-            <div class="col-md-3">{{ node.name }}</div>
-            <div class="col-md-3">{{ node.host }}</div>
-            <div class="col-md-3">{{ node.port }}</div>
-            <div class="col-md-3"><span class="glyphicon {% if node.alive %}glyphicon-ok{% else %}glyphicon-remove{% endif %}"></span></div>
+            <div class="col-md-4 col-sm-3">{{ node.name }}</div>
+            <div class="col-md-5 col-sm-6">{{ node.host }}</div>
+            <div class="col-md-1 col-sm-1">{{ node.port }}</div>
+            <div class="col-md-2 col-sm-2"><span class="glyphicon {% if node.alive %}glyphicon-ok{% else %}glyphicon-remove{% endif %}"></span></div>
         </div>
         {% endfor %}
 
